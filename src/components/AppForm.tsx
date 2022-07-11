@@ -15,6 +15,33 @@ interface AppFormProps {
     onSubmit: (e: FormValues) => void
 }
 
+const Validators = {
+    text(fieldName: string) {
+        return (d: string) => {
+            if (!d || typeof d !== 'string') {
+                return `${fieldName} is a required field`;
+            }
+            if (!/^[a-z ]+$/gi.test(d)) {
+                return `${fieldName} must not contain numbers or special characters`;
+            }
+            return false;
+        }
+    },
+    email(fieldName: string) {
+        return (d: string) => {
+            if (!d || typeof d !== 'string') {
+                return `${fieldName} is a required field`;
+            }
+            if (
+                !/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(d)
+            ) {
+                return `${fieldName} must be a valid email`;
+            }
+            return false;
+        }
+    },
+}
+
 export default function AppForm(props: AppFormProps) {
     const [formValues, setFormValues] = useState<FormValues>({
         name: '',
@@ -22,7 +49,7 @@ export default function AppForm(props: AppFormProps) {
         email: '',
         age: '',
         gender: '',
-        favoriteColor: '#55aaFF',
+        favoriteColor: '',
         receiveNotifications: false
     });
 
@@ -56,6 +83,7 @@ export default function AppForm(props: AppFormProps) {
                 label='Name'
                 value={formValues.name}
                 onChange={handleInputChange}
+                validate={Validators.text('Name')}
             />
             <Input
                 id='surname'
@@ -64,6 +92,7 @@ export default function AppForm(props: AppFormProps) {
                 label='Surname'
                 value={formValues.surname}
                 onChange={handleInputChange}
+                validate={Validators.text('Surname')}
             />
             <Input
                 id='age'
@@ -80,14 +109,16 @@ export default function AppForm(props: AppFormProps) {
                 label='Email'
                 value={formValues.email}
                 onChange={handleInputChange}
+                validate={Validators.email('Email')}
             />
             <Input
                 id='favoriteColor'
                 name='favoriteColor'
-                type='color'
+                type='text'
                 label='Favorite Color'
                 value={formValues.favoriteColor}
                 onChange={handleInputChange}
+                validate={Validators.text('Favorite Color')}
             />
             <Input
                 type='radio'

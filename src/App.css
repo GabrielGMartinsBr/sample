@@ -28,7 +28,20 @@ label {
 }
 
 .form-field input:not([type="color"]) {
+  border-radius: .25rem;
   padding: .5rem;
+  border: solid thin;
+}
+
+.form-field input.has-error {
+  outline: thin solid red;
+  border: solid thin red;
+}
+
+.error-message {
+  margin-top: .25rem;
+  color: red;
+  font-size: .9rem;
 }
 
 .btn {

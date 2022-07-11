@@ -1,10 +1,11 @@
-import { KeyboardEvent } from 'react';
+import { KeyboardEvent, useState } from 'react';
 
 interface BaseInputProps {
     id: string;
     name: string;
     label: string;
     onChange: (e: KeyboardEvent<HTMLInputElement>) => void;
+    validate?: (value: any) => boolean | string;
 }
 
 interface TextInputProps extends BaseInputProps {
@@ -26,6 +27,16 @@ interface CheckboxInputProps extends BaseInputProps {
 type InputProps = TextInputProps | RadioInputProps | CheckboxInputProps;
 
 export default function Input(props: InputProps) {
+    const [error, setError] = useState<boolean | string>(false);
+    const handleBlur = () => {
+        if (typeof props.validate !== 'function') {
+            return;
+        }
+        setError(
+            props.validate(props.value)
+        );
+    }
+
     if (props.type === 'radio') {
         return (
             <div className="form-field">
@@ -54,6 +65,7 @@ export default function Input(props: InputProps) {
                         type="checkbox"
                         checked={props.value}
                         onChange={props.onChange}
+                        onBlur={handleBlur}
                     />
                     <span>{props.label}</span>
                 </label>
@@ -70,7 +82,13 @@ export default function Input(props: InputProps) {
                 type={props.type}
                 value={props.value}
                 onChange={props.onChange}
+                onBlur={handleBlur}
+                className={error ? 'has-error' : ''}
+                required={!!props.validate}
             />
+            {error && typeof error === 'string' && (
+                <div className="error-message">{error}</div>
+            )}
         </div>
     );
 }
