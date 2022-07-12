@@ -1,5 +1,5 @@
 export default function SubHeading() {
     return (
-        <div>SubHeading</div>
+        <h2>Sample form</h2>
     )
 }

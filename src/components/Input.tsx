@@ -1,39 +1,38 @@
-import { KeyboardEvent, useState } from 'react';
+import { FormField } from './FormField';
 
 interface BaseInputProps {
     id: string;
     name: string;
     label: string;
-    onChange: (e: KeyboardEvent<HTMLInputElement>) => void;
-    validate?: (value: any) => boolean | string;
+    placeholder?: string;
+    validator?: (value: any) => boolean | string;
+    formField: FormField;
 }
 
 interface TextInputProps extends BaseInputProps {
     type: 'text' | 'number' | 'email' | 'color';
-    value: string;
 }
 
 interface RadioInputProps extends BaseInputProps {
     type: 'radio';
     options: { value: string; label: string; }[];
-    value: string;
 }
 
 interface CheckboxInputProps extends BaseInputProps {
     type: 'checkbox';
-    value: boolean;
 }
 
 type InputProps = TextInputProps | RadioInputProps | CheckboxInputProps;
 
 export default function Input(props: InputProps) {
-    const [error, setError] = useState<boolean | string>(false);
+    const { formField } = props;
+
     const handleBlur = () => {
-        if (typeof props.validate !== 'function') {
+        if (typeof props.validator !== 'function') {
             return;
         }
-        setError(
-            props.validate(props.value)
+        formField.setError(
+            props.validator(formField.value)
         );
     }
 
@@ -47,7 +46,7 @@ export default function Input(props: InputProps) {
                             name={props.name}
                             type="radio"
                             value={option.value}
-                            onChange={props.onChange}
+                            onChange={e => formField.setValue(e.target.value)}
                         />
                         <span className='ml-1'>{option.label}</span>
                     </label>
@@ -63,8 +62,8 @@ export default function Input(props: InputProps) {
                     <input
                         name={props.name}
                         type="checkbox"
-                        checked={props.value}
-                        onChange={props.onChange}
+                        checked={formField.value}
+                        onChange={e => formField.setValue(e.target.checked)}
                         onBlur={handleBlur}
                     />
                     <span>{props.label}</span>
@@ -80,14 +79,15 @@ export default function Input(props: InputProps) {
                 id={props.id}
                 name={props.name}
                 type={props.type}
-                value={props.value}
-                onChange={props.onChange}
+                value={formField.value}
+                onChange={e => formField.setValue(e.target.value)}
                 onBlur={handleBlur}
-                className={error ? 'has-error' : ''}
-                required={!!props.validate}
+                className={formField.error ? 'has-error' : ''}
+                required={!!props.validator}
+                placeholder={props.placeholder}
             />
-            {error && typeof error === 'string' && (
-                <div className="error-message">{error}</div>
+            {formField.error && typeof formField.error === 'string' && (
+                <div className="error-message">{formField.error}</div>
             )}
         </div>
     );
